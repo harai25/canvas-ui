@@ -6,7 +6,7 @@ import { draw } from "./lib/render/render";
 
 
 let elems: IRowElement[] = [];
-for (let i = 0; i < 50; i++) {
+for (let i = 0; i < 5000000; i++) {
   elems.push({
     marginTop: 10,
     marginLeft: 10,
@@ -20,7 +20,7 @@ for (let i = 0; i < 50; i++) {
 rows(elems);
 
 let elems2: IRowElement[] = [];
-for (let i = 0; i < 100; i++) {
+for (let i = 0; i < 1000000; i++) {
   elems2.push({
     marginTop: 25,
     marginLeft: 10,

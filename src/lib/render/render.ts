@@ -1,5 +1,5 @@
 import { canvas, ctx } from "../canvas";
-import { manyBinarySearch, mergeSortedTree } from "../helpers/arrayMethods";
+import { throttle } from "../helpers/opt";
 
 export interface IRenderElement {
   x: number;
@@ -56,6 +56,8 @@ function render(x: number, y: number, width: number, height: number) {
     }
   }
 }
+
+export const throttleDraw = throttle(draw, 0)
 
 export function draw(
   x = 0,

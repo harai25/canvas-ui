@@ -3,10 +3,8 @@ import { rows, type IRowElement } from "./lib/molecules/rows";
 import { renderAbsolute } from "./lib/molecules/absolute";
 import { draw } from "./lib/render/render";
 
-
-
 let elems: IRowElement[] = [];
-for (let i = 0; i < 5000000; i++) {
+for (let i = 0; i < 500000; i++) {
   elems.push({
     marginTop: 10,
     marginLeft: 10,
@@ -24,15 +22,14 @@ for (let i = 0; i < 1000000; i++) {
   elems2.push({
     marginTop: 25,
     marginLeft: 10,
-    background: 'yellow',
+    background: "yellow",
     content: `${i}. testestests estest testestset esteststse`,
     width: 500,
     height: 50,
     click: () => console.log(i),
   });
 }
-rows(elems2, {x: 500});
-
+rows(elems2, { x: 500 });
 
 renderAbsolute({
   x: 700,
@@ -42,5 +39,4 @@ renderAbsolute({
   background: "green",
 });
 
-
-draw()
+draw();

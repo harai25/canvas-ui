@@ -1,5 +1,5 @@
-import { canvas, ctx } from "../canvas"
-import { draw } from "../render/render"
+import { canvas } from "../canvas"
+import { draw, throttleDraw } from "../render/render"
 
 const SCROLL_RATIO = 0.15
 
@@ -13,7 +13,7 @@ export function createScroll() {
     scrollX = createX - x
     scrollY = createY - y
     requestAnimationFrame(() => {
-      draw(scrollX, scrollY, canvas.width, canvas.height)
+      throttleDraw(scrollX, scrollY, canvas.width, canvas.height)
     })
   }
 }

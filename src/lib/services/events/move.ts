@@ -1,6 +1,6 @@
 import { canvas } from "../../canvas";
 import { animate, easeOutQuad } from "../../helpers/animation";
-import { createScroll } from "../scroll";
+import { createScroll } from "./camera";
 
 const RUN_MULTIPLY = 2
 

@@ -42,11 +42,11 @@ export function addElementsToRender(objects: IRenderElement[]) {
   objects.forEach(attachElement)
 }
 
-function render(x: number, y: number, width: number, height: number) {
-  const ax = Math.floor(x / SECTOR_SIZE)
-  const ay = Math.floor(y / SECTOR_SIZE)
-  const bx = Math.floor((x + width) / SECTOR_SIZE)
-  const by = Math.floor((y + height) / SECTOR_SIZE)
+function render(x: number, y: number, width: number, height: number, zoom: number) {
+  const ax = Math.floor(x / SECTOR_SIZE / zoom)
+  const ay = Math.floor(y / SECTOR_SIZE / zoom)
+  const bx = Math.floor((x + width) /  SECTOR_SIZE / zoom)
+  const by = Math.floor((y + height) / SECTOR_SIZE / zoom)
   for (let i = ax; i <= bx; i++) {
     for (let j = ay; j <=by; j++) {
       const sector = getSector(i, j)
@@ -63,10 +63,12 @@ export function draw(
   x = 0,
   y = 0,
   width = window.innerWidth,
-  height = window.innerHeight
+  height = window.innerHeight,
+  zoom = 1,
 ) {
   ctx.resetTransform();
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.setTransform(1, 0, 0, 1, -x, -y);
-  render(x, y, width, height);
+  ctx.setTransform(1 * zoom, 0, 0, 1 * zoom, -x, -y);
+
+  render(x, y, width, height, zoom);
 }

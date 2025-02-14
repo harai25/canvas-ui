@@ -1,5 +1,5 @@
 import { canvas } from "../../canvas";
-import { updateScroll } from "../scroll";
+import { wheelZoom } from "./camera";
 import { moveEvents } from "./move";
 
 const SECTOR_SIZE = 150;
@@ -63,13 +63,9 @@ function click(x: number, y: number) {
   }
 }
 
-function wheel(event: WheelEvent) {
-  event.preventDefault();
-  updateScroll(event.deltaX, event.deltaY);
-}
 export function createAllEvents() {
   canvas.addEventListener("click", (e) => click(e.x, e.y));
-  canvas.addEventListener("wheel", wheel);
+  canvas.addEventListener("wheel", wheelZoom);
 
   moveEvents();
 }

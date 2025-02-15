@@ -1,7 +1,3 @@
-import { canvas } from "../../canvas";
-import { wheelZoom } from "./camera";
-import { moveEvents } from "./move";
-
 const SECTOR_SIZE = 150;
 
 const sectors: IEventElement[][][] = [];
@@ -52,7 +48,7 @@ export function attachEventListener(element: IEventElement) {
   }
 }
 
-function click(x: number, y: number) {
+export function click(x: number, y: number) {
   const sector = getSector(
     Math.floor(x / SECTOR_SIZE),
     Math.floor(y / SECTOR_SIZE)
@@ -61,11 +57,4 @@ function click(x: number, y: number) {
     const el = findInSector(x, y, sector);
     el?.click();
   }
-}
-
-export function createAllEvents() {
-  canvas.addEventListener("click", (e) => click(e.x, e.y));
-  canvas.addEventListener("wheel", wheelZoom);
-
-  moveEvents();
 }

@@ -1,10 +1,8 @@
+import type { IRowElement } from "~/components/molecules/rows";
+import { initCanvasUI } from "./canvas-ui";
 import "./styles/main.css";
-import { rows, type IRowElement } from "./lib/molecules/rows";
-import { renderAbsolute } from "./lib/molecules/absolute";
-import { draw } from "./lib/render/render";
 
-const count = 1000
-
+const count = 20
 
 let elems: IRowElement[] = [];
 for (let i = 0; i < count / 2; i++) {
@@ -18,8 +16,6 @@ for (let i = 0; i < count / 2; i++) {
     click: () => console.log(i),
   });
 }
-rows(elems);
-
 let elems2: IRowElement[] = [];
 for (let i = 0; i < count; i++) {
   elems2.push({
@@ -32,23 +28,26 @@ for (let i = 0; i < count; i++) {
     click: () => console.log(i),
   });
 }
-rows(elems2, { x: 500 });
-
-renderAbsolute({
-  x: 700,
-  y: 150,
-  width: 100,
-  height: 100,
-  background: "green",
-});
-
-renderAbsolute({
-  x: -100,
-  y: -100,
-  width: 100,
-  height: 100,
-  background: "red",
-});
 
 
-draw();
+initCanvasUI(document.getElementById('canvas') as HTMLCanvasElement).render(componentsManager => {
+  componentsManager.molecules.rows(elems);
+
+  componentsManager.molecules.rows(elems2, { x: 500 });
+
+  componentsManager.molecules.absolute({
+    x: 700,
+    y: 150,
+    width: 100,
+    height: 100,
+    background: "green",
+  });
+
+  componentsManager.molecules.absolute({
+    x: -100,
+    y: -100,
+    width: 100,
+    height: 100,
+    background: "red",
+  });
+})

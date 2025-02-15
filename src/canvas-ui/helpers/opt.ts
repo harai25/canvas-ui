@@ -2,7 +2,7 @@ export const throttle = <T extends (...args: any[]) => any>(
   cb: T,
   wait: number
 ): ((...args: Parameters<T>) => void) => {
-  let timeout: number | null = null;
+  let timeout: NodeJS.Timeout | null = null;
   return (...args: Parameters<T>) => {
     if (timeout) return;
     timeout = setTimeout(() => {

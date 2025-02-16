@@ -27,7 +27,7 @@ export function createRows(canvasManager: ICanvasManager, servicesManager: IServ
     let y = config.y ?? 0;
   
     const renderElements: IRenderElement[] = [];
-  
+
     for (let i = 0; i < elements.length; i++) {
       const element = elements[i];
       y += element.marginTop ?? 0;

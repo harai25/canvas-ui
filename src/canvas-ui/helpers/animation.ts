@@ -28,3 +28,16 @@ export function animate(
     }
   });
 }
+
+export function throttleAnimate<T extends (...args: any[]) => any>(
+  cb: T,
+) {
+  let isAllow = true
+  return (...args: Parameters<T>) => {
+    requestAnimationFrame(() => {
+      isAllow = true
+      cb(...args)
+    })
+    isAllow = false
+  };
+}

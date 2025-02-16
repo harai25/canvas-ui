@@ -10,13 +10,14 @@ export interface ICamera {
 }
 
 export function initCameraControl(canvasManager: ICanvasManager, renderManager: IRenderManager) {
+  const {width, height} = canvasManager.getCanvasSize()
   const camera: ICamera = {
     moveX: 0,
     moveY: 0,
     zoomRatio: 1,
   }
   const renderCamera = () => {
-    const {width, height} = canvasManager.getCanvasSize()
+    // const {width, height} = canvasManager.getCanvasSize()
     renderManager.render(camera.moveX, camera.moveY, width, height, camera.zoomRatio)
   }
 

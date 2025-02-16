@@ -5,8 +5,7 @@ export interface IRenderElement {
   height: number;
   render: () => void;
 }
-const SECTOR_SIZE = 500;
-const CHUNK_SIZE = 100000
+const SECTOR_SIZE = 1000;
 
 export function createSectorsManager() {
   const sectors: IRenderElement[][][] = [];
@@ -37,22 +36,16 @@ export function createSectorsManager() {
     }
   }
 
-  function attachChunkElements(objects: IRenderElement[], start: number) {
-    const end = Math.min(objects.length, start + CHUNK_SIZE)
-    for (let i = start; i<Math.min(objects.length, start + CHUNK_SIZE); i++) {
-      attachElement(objects[i])
-    }
-
-    if (end !== objects.length) {
-      setTimeout(() => {
-        console.log('chunked')
-        attachChunkElements(objects, end)
-      }, 300)
-    }
-  }
-
   function attachElements(objects: IRenderElement[]) {
-    attachChunkElements(objects, 0)
+    objects.forEach(attachElement)
+    // processChunkFor({
+    //   end: objects.length,
+    //   cb: (i) => {
+    //     attachElement(objects[i])
+    //   },
+    //   // timeout: 300
+    // })
+    // attachChunkElements(objects, 0)
   }
 
   return {

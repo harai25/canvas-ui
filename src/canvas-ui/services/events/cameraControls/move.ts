@@ -1,10 +1,13 @@
 import type { ICanvasManager } from "~/canvas";
 import type { ICamera } from ".";
-import { animate, easeOutQuad } from "~/helpers/animation";
+import { animate, easeOutQuad, throttleAnimate } from "~/helpers/animation";
 import { terminal } from 'virtual:terminal'
 
-const RUN_MULTIPLY = 30
-const RUN_TIME = 1000
+// const RUN_MULTIPLY = 30
+// const RUN_TIME = 1000
+
+const RUN_MULTIPLY = 100
+const RUN_TIME = 2000
 
 export function initMove(canvasManager: ICanvasManager, cameraPointer: ICamera, renderCamera: () => void) {
 
@@ -69,13 +72,20 @@ export function initMove(canvasManager: ICanvasManager, cameraPointer: ICamera, 
     xDown = x;
     yDown = y;
   }
+
+  const throttlePointerMove = throttleAnimate(pointermove)
+  // const throttlePointerMove = throttle(pointermove, 10)
   
   function desktopEvents() {
     let cancelMousemoveEvent: () => void = () => {}
     canvasManager.eventsMethods.addEvent("mousedown", e => {
       pointerdown(e.x, e.y)
       timeout = setTimeout(() => {
-        cancelMousemoveEvent = canvasManager.eventsMethods.addEvent("mousemove", pointermove)
+        cancelMousemoveEvent = canvasManager.eventsMethods.addEvent("mousemove", (e) => {
+          e.preventDefault()
+          throttlePointerMove(e)
+          // pointermove(e)
+        })
       }, 50);
     })
   
@@ -85,13 +95,16 @@ export function initMove(canvasManager: ICanvasManager, cameraPointer: ICamera, 
     });
   }
   function mobileEvents() {
+    const pointers: Record<number, any> = {}
     canvasManager.eventsMethods.addEvent("touchmove", (e) => {
       e.preventDefault()
 
       // terminal.log('touchmove')
-      // for (const touch of e.touches) {
-      //   terminal.log(touch.identifier)
-      // }
+      let string = ''
+      for (const touch of e.touches) {
+        string += `${touch.identifier} - `
+      }
+      terminal.log(string)
       // terminal.log('end touchmove')
 
       if (e.touches.length === 1) {

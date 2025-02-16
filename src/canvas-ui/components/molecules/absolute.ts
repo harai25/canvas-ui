@@ -13,7 +13,7 @@ interface IAbsoluteRender {
 
 export function createAbsolute(canvasManager: ICanvasManager, servicesManager: IServicesManager, atoms: IAtoms) {
   return (params: IAbsoluteRender) => {
-    servicesManager.renderManager.attachElement({
+    servicesManager.sectorManager.attachElement({
       x: params.x,
       y: params.y,
       width: params.width ?? 0,

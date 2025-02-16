@@ -1,8 +1,8 @@
 import { type ICanvasManager } from "~/canvas";
 // import { attachEventListener } from "~/services/events/eventsAggregator";
 import type { IAtoms } from "../atoms";
-import type { IRenderElement, IRenderManager } from "~/services/render";
 import type { IServicesManager } from "~/services";
+import type { IRenderElement } from "~/services/sectors";
 
 interface IRowConfig {
   x?: number;
@@ -66,6 +66,6 @@ export function createRows(canvasManager: ICanvasManager, servicesManager: IServ
       y += height;
     }
   
-    servicesManager.renderManager.attachElements(renderElements)
+    servicesManager.sectorManager.attachElements(renderElements)
   };
 }

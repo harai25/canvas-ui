@@ -1,8 +1,10 @@
 import type { ICanvasManager } from "~/canvas";
 import type { ICamera } from ".";
 import { animate, easeOutQuad } from "~/helpers/animation";
+import { terminal } from 'virtual:terminal'
 
-const RUN_MULTIPLY = 2
+const RUN_MULTIPLY = 30
+const RUN_TIME = 1000
 
 export function initMove(canvasManager: ICanvasManager, cameraPointer: ICamera, renderCamera: () => void) {
 
@@ -53,7 +55,7 @@ export function initMove(canvasManager: ICanvasManager, cameraPointer: ICamera, 
         const y = lastMoveY + (lastMoveY - preLastMoveY) * RUN_MULTIPLY * progress
         scroll(x, y);
       },
-      300,
+      RUN_TIME,
       controller.signal
     );
     if (timeout) {
@@ -84,12 +86,32 @@ export function initMove(canvasManager: ICanvasManager, cameraPointer: ICamera, 
   }
   function mobileEvents() {
     canvasManager.eventsMethods.addEvent("touchmove", (e) => {
-      pointermove({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+      e.preventDefault()
+
+      // terminal.log('touchmove')
+      // for (const touch of e.touches) {
+      //   terminal.log(touch.identifier)
+      // }
+      // terminal.log('end touchmove')
+
+      if (e.touches.length === 1) {
+        pointermove({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+      }
     });
     canvasManager.eventsMethods.addEvent("touchstart", (e) => {
       pointerdown(e.touches[0].clientX, e.touches[0].clientY)
+
+      // for (const touch of e.touches) {
+      //   terminal.log(touch.identifier)
+      // }
+      // terminal.log('---------')
     });
-    canvasManager.eventsMethods.addEvent("touchend", pointerup);
+    canvasManager.eventsMethods.addEvent("touchend", (e) => {
+      if (!e.touches.length) {
+        terminal.log('touchend')
+        pointerup()
+      }
+    });
   }
   desktopEvents()
   mobileEvents()

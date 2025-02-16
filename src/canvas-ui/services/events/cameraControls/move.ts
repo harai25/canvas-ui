@@ -1,4 +1,3 @@
-import type { ICanvasManager } from "~/canvas";
 import { animate, easeOutQuad, throttleAnimate } from "~/helpers/animation";
 import type { ICameraControl } from "./cameraControl";
 
@@ -8,25 +7,32 @@ const INNERTION_TIME = 1000
 // const RUN_MULTIPLY = 100
 // const RUN_TIME = 2000
 
-export function initMove(canvasManager: ICanvasManager, cameraControl: ICameraControl) {
+export function createMoveControl(cameraControl: ICameraControl) {
 
   let isMove = false
   
   let innertionAbort: AbortController | null = null;
+  let pointerDownX = 0
+  let pointerDownY = 0
+  let startMoveX = 0
+  let startMoveY = 0
 
-  let scroll: ReturnType<typeof createScroll> = () => {}
-  function createScroll(pointerDownX: number, pointerDownY: number) {
-    const { moveX, moveY} = cameraControl.getCamera()
-
-    return throttleAnimate((x: number, y: number) => {
-      isMove = true
-      cameraControl.setCamera({
-        moveX: moveX - x + pointerDownX,
-        moveY: moveY - y + pointerDownY,
-      })
+  function scroll(x: number, y: number) {
+    isMove = true
+    cameraControl.setCamera({
+      moveX: startMoveX - x + pointerDownX,
+      moveY: startMoveY - y + pointerDownY,
     })
   }
-  
+
+  function pointerdown(x: number, y: number) {
+    const camera = cameraControl.getCamera()
+    startMoveX = camera.moveX
+    startMoveY = camera.moveY
+    pointerDownX = x
+    pointerDownY = y
+    innertionAbort?.abort();
+  }
   
   function pointerup() {
     if (!isMove) {
@@ -52,54 +58,9 @@ export function initMove(canvasManager: ICanvasManager, cameraControl: ICameraCo
     
   }
   
-  function pointerdown(x: number, y: number) {
-    scroll = createScroll(x, y)
-    innertionAbort?.abort();
+  return {
+    pointerdown, pointerup, scroll: throttleAnimate(scroll)
   }
-
-  function desktopEvents() {
-    let mouseDownTimeout: NodeJS.Timeout | null = null;
-    let cancelMousemoveEvent: () => void = () => {}
-    canvasManager.eventsMethods.addEvent("mousedown", eventMouseDown => {
-      pointerdown(eventMouseDown.x, eventMouseDown.y)
-      mouseDownTimeout = setTimeout(() => {
-        cancelMousemoveEvent = canvasManager.eventsMethods.addEvent("mousemove", eventMouseMove => {
-          eventMouseDown.preventDefault()
-          scroll(eventMouseMove.x, eventMouseMove.y)
-        })
-      }, 50);
-    })
-  
-    canvasManager.eventsMethods.addEvent("mouseup", () => {
-      pointerup()
-      if (mouseDownTimeout) {
-        clearTimeout(mouseDownTimeout);
-      }
-      cancelMousemoveEvent()
-    });
-  }
-  function mobileEvents() {
-    canvasManager.eventsMethods.addEvent("touchmove", (e) => {
-      e.preventDefault()
-      if (e.touches.length === 1) {
-        scroll(e.touches[0].clientX, e.touches[0].clientY)
-      }
-    });
-    canvasManager.eventsMethods.addEvent("touchstart", (e) => {
-      if (e.touches.length === 1) {
-        pointerdown(e.touches[0].clientX, e.touches[0].clientY)
-      }
-
-    });
-    canvasManager.eventsMethods.addEvent("touchend", (e) => {
-      if (e.touches.length === 1) {
-        pointerdown(e.touches[0].clientX, e.touches[0].clientY)
-      }
-      if (!e.touches.length) {
-        pointerup()
-      }
-    });
-  }
-  desktopEvents()
-  mobileEvents()
 }
+
+export type IMoveControl = ReturnType<typeof createMoveControl>

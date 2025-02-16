@@ -1,20 +1,24 @@
 import type { ICanvasManager } from "~/canvas";
-import type { ICamera } from ".";
+import type { ICameraControl } from "./cameraControl";
 
-export function initZoom(canvasManager: ICanvasManager, cameraPointer: ICamera, renderCamera: () => void) {
+export function initZoom(canvasManager: ICanvasManager, cameraControl: ICameraControl) {
   function zoom(x: number, y: number, zoom: number) {
     // Координаты курсора мыши в мировых координатах до изменения масштаба
-    const pointerX = (cameraPointer.moveX + x) / cameraPointer.zoomRatio;
-    const pointerY = (cameraPointer.moveY + y) / cameraPointer.zoomRatio;
+    const camera = cameraControl.getCamera()
+    const pointerX = (camera.moveX + x) / camera.zoomRatio;
+    const pointerY = (camera.moveY + y) / camera.zoomRatio;
 
-    const prevZoomRatio = cameraPointer.zoomRatio;
-    cameraPointer.zoomRatio = Math.max(zoom, 0.4)
+    const prevZoomRatio = camera.zoomRatio;
 
-    // Корректируем смещение для приближения в курсор
-    cameraPointer.moveX += pointerX * (cameraPointer.zoomRatio - prevZoomRatio);
-    cameraPointer.moveY += pointerY * (cameraPointer.zoomRatio - prevZoomRatio);
+    const zoomRatio = Math.max(zoom, 0.4)
+    const moveX = camera.moveX + pointerX * (zoomRatio - prevZoomRatio)
+    const moveY = camera.moveY + pointerY * (zoomRatio - prevZoomRatio)
+    cameraControl.setCamera({
+      moveX,
+      moveY,
+      zoomRatio,
+    })
 
-    renderCamera();
   }
   
   function mobileEvents() {
@@ -37,7 +41,7 @@ export function initZoom(canvasManager: ICanvasManager, cameraPointer: ICamera, 
     }
     function touchstart(event: TouchEvent) {
       if (event.touches.length >= 2) {
-        startZoom = cameraPointer.zoomRatio
+        startZoom = cameraControl.getCamera().zoomRatio
         startFingersDistance = getFingersDistance(event)
         centerX = (event.touches[0].clientX + event.touches[1].clientX) / 2
         centerY = (event.touches[0].clientY + event.touches[1].clientY) / 2
@@ -53,7 +57,7 @@ export function initZoom(canvasManager: ICanvasManager, cameraPointer: ICamera, 
     function wheelZoom(event: WheelEvent) {
       event.preventDefault();
       const dRatio = event.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP
-      zoom(event.x, event.y, cameraPointer.zoomRatio + dRatio)
+      zoom(event.x, event.y, cameraControl.getCamera().zoomRatio + dRatio)
     }
 
     canvasManager.eventsMethods.addEvent("wheel", wheelZoom)

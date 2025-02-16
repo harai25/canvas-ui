@@ -1,127 +1,101 @@
 import type { ICanvasManager } from "~/canvas";
-import type { ICamera } from ".";
 import { animate, easeOutQuad, throttleAnimate } from "~/helpers/animation";
-import { terminal } from 'virtual:terminal'
+import type { ICameraControl } from "./cameraControl";
 
-// const RUN_MULTIPLY = 30
-// const RUN_TIME = 1000
+const INNERTION_FACTOR = 30
+const INNERTION_TIME = 1000
 
-const RUN_MULTIPLY = 100
-const RUN_TIME = 2000
+// const RUN_MULTIPLY = 100
+// const RUN_TIME = 2000
 
-export function initMove(canvasManager: ICanvasManager, cameraPointer: ICamera, renderCamera: () => void) {
+export function initMove(canvasManager: ICanvasManager, cameraControl: ICameraControl) {
 
-  let timeout: NodeJS.Timeout | null = null;
-
-  let xDown = 0;
-  let yDown = 0;
-  
-  let lastMoveX = 0;
-  let lastMoveY = 0;
-  let preLastMoveX = 0;
-  let preLastMoveY = 0;
   let isMove = false
   
-  let controller: AbortController | null = null;
+  let innertionAbort: AbortController | null = null;
 
   let scroll: ReturnType<typeof createScroll> = () => {}
-  function createScroll() {
-    let createX = cameraPointer.moveX;
-    let createY = cameraPointer.moveY;
+  function createScroll(pointerDownX: number, pointerDownY: number) {
+    const { moveX, moveY} = cameraControl.getCamera()
 
-    return (x: number, y: number) => {
-      cameraPointer.moveX = createX - x;
-      cameraPointer.moveY = createY - y;
-      renderCamera()
-    }
+    return throttleAnimate((x: number, y: number) => {
+      isMove = true
+      cameraControl.setCamera({
+        moveX: moveX - x + pointerDownX,
+        moveY: moveY - y + pointerDownY,
+      })
+    })
   }
   
-  function pointermove(e: { x: number; y: number }) {
-    isMove = true
-    preLastMoveX = lastMoveX;
-    preLastMoveY = lastMoveY;
-    lastMoveX = e.x - xDown;
-    lastMoveY = e.y - yDown;
-    scroll(lastMoveX, lastMoveY);
-  }
   
   function pointerup() {
     if (!isMove) {
       return;
     }
     isMove = false
-    controller = new AbortController();
+    innertionAbort = new AbortController();
+    const camera = cameraControl.getCamera()
+    const prevCamera = cameraControl.getPrevCamera()
     animate(
       easeOutQuad,
       (progress) => {
-        const x = lastMoveX + (lastMoveX - preLastMoveX) * RUN_MULTIPLY * progress
-        const y = lastMoveY + (lastMoveY - preLastMoveY) * RUN_MULTIPLY * progress
-        scroll(x, y);
+        const moveX = camera.moveX + (camera.moveX - prevCamera.moveX) * INNERTION_FACTOR * progress
+        const moveY = camera.moveY + (camera.moveY - prevCamera.moveY) * INNERTION_FACTOR * progress
+        cameraControl.setCamera({
+          moveX,
+          moveY,
+        })
       },
-      RUN_TIME,
-      controller.signal
+      INNERTION_TIME,
+      innertionAbort.signal
     );
-    if (timeout) {
-      clearTimeout(timeout);
-    }
+    
   }
   
   function pointerdown(x: number, y: number) {
-    scroll = createScroll()
-    controller?.abort();
-    xDown = x;
-    yDown = y;
+    scroll = createScroll(x, y)
+    innertionAbort?.abort();
   }
 
-  const throttlePointerMove = throttleAnimate(pointermove)
-  // const throttlePointerMove = throttle(pointermove, 10)
-  
   function desktopEvents() {
+    let mouseDownTimeout: NodeJS.Timeout | null = null;
     let cancelMousemoveEvent: () => void = () => {}
-    canvasManager.eventsMethods.addEvent("mousedown", e => {
-      pointerdown(e.x, e.y)
-      timeout = setTimeout(() => {
-        cancelMousemoveEvent = canvasManager.eventsMethods.addEvent("mousemove", (e) => {
-          e.preventDefault()
-          throttlePointerMove(e)
-          // pointermove(e)
+    canvasManager.eventsMethods.addEvent("mousedown", eventMouseDown => {
+      pointerdown(eventMouseDown.x, eventMouseDown.y)
+      mouseDownTimeout = setTimeout(() => {
+        cancelMousemoveEvent = canvasManager.eventsMethods.addEvent("mousemove", eventMouseMove => {
+          eventMouseDown.preventDefault()
+          scroll(eventMouseMove.x, eventMouseMove.y)
         })
       }, 50);
     })
   
     canvasManager.eventsMethods.addEvent("mouseup", () => {
       pointerup()
+      if (mouseDownTimeout) {
+        clearTimeout(mouseDownTimeout);
+      }
       cancelMousemoveEvent()
     });
   }
   function mobileEvents() {
-    const pointers: Record<number, any> = {}
     canvasManager.eventsMethods.addEvent("touchmove", (e) => {
       e.preventDefault()
-
-      // terminal.log('touchmove')
-      let string = ''
-      for (const touch of e.touches) {
-        string += `${touch.identifier} - `
-      }
-      terminal.log(string)
-      // terminal.log('end touchmove')
-
       if (e.touches.length === 1) {
-        pointermove({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+        scroll(e.touches[0].clientX, e.touches[0].clientY)
       }
     });
     canvasManager.eventsMethods.addEvent("touchstart", (e) => {
-      pointerdown(e.touches[0].clientX, e.touches[0].clientY)
+      if (e.touches.length === 1) {
+        pointerdown(e.touches[0].clientX, e.touches[0].clientY)
+      }
 
-      // for (const touch of e.touches) {
-      //   terminal.log(touch.identifier)
-      // }
-      // terminal.log('---------')
     });
     canvasManager.eventsMethods.addEvent("touchend", (e) => {
+      if (e.touches.length === 1) {
+        pointerdown(e.touches[0].clientX, e.touches[0].clientY)
+      }
       if (!e.touches.length) {
-        terminal.log('touchend')
         pointerup()
       }
     });

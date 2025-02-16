@@ -2,7 +2,7 @@ import type { IRowElement } from "~/components/molecules/rows";
 import { initCanvasUI } from "./canvas-ui";
 import "./styles/main.css";
 
-const count = 1000000
+const count = 100
 // const count = 2000000
 
 let elems: IRowElement[] = [];

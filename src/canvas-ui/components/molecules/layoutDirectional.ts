@@ -1,94 +1,107 @@
-import { type ICanvasManager } from "~/canvas";
-import type { IAtoms } from "../atoms";
-import type { IServicesManager } from "~/services";
-import type { ISectorElement } from "~/services/sectors";
-import type { IComponent } from "~/types/component";
-
-export interface IComponentConfig {
-  x?: number;
-  y?: number;
-  color?: string;
-  direction: "vert" | "horyz";
-}
+import { type ICanvasManager } from '~/canvas'
+import type { IAtoms } from '../atoms'
+import type { IServicesManager } from '~/services'
+import type { ISectorElement } from '~/services/sectors'
+import type { IComponent, IComponentConfig, IConfig, IReturnComponent, ITextBlock } from '~/types/component'
 
 export function createLayoutDirectionals(
   canvasManager: ICanvasManager,
   servicesManager: IServicesManager,
-  atoms: IAtoms
+  atoms: IAtoms,
 ) {
-  function layoutDirectional(elements: IComponent[], config: IComponentConfig) {
-    let x = config.x ?? 0;
-    let y = config.y ?? 0;
-    const renderElements: ISectorElement[] = [];
-    for (let i = 0; i < elements.length; i++) {
-      const element = elements[i];
-
-      let currX = x;
-      let currY = y;
-      if (config.direction === "vert") {
-        y += element.marginTop ?? 0;
-        currX = x + (element.marginLeft ?? 0);
-      } else {
-        x += element.marginLeft ?? 0;
-        currY = y + (element.marginTop ?? 0);
-      }
-      const width = element.width;
-      const height = element.height;
-      renderElements.push({
-        x,
-        y,
-        width,
-        height,
-        render: () => {
-          canvasManager.rectangleMethods.drawRectangle({
+  function renderTextBlock(
+    textBlock: ITextBlock,
+    x: number,
+    y: number,
+    currX: number,
+    currY: number,
+    click: IComponent['click'],
+  ): ISectorElement {
+    return {x, y, width: textBlock.width, height: textBlock.height, events: {click},
+      render: () => {
+        canvasManager.rectangleMethods.drawRectangle({
+          x: currX,
+          y: currY,
+          width: textBlock.width,
+          height: textBlock.height,
+          background: textBlock.background ?? 'black',
+        })
+        if (textBlock.text) {
+          atoms.text({
+            content: textBlock.text,
+            color: textBlock.color,
             x: currX,
             y: currY,
-            width,
-            height,
-            background: element.background ?? "black",
-          });
-          if (element.content) {
-            atoms.text({
-              content: element.content,
-              color: element.color,
-              x: currX,
-              y: currY,
-              width,
-              fontSize: 24,
-            });
-          }
-        },
-        events: {
-          click: element.click,
-        },
-      });
+            width: textBlock.width,
+            fontSize: 24,
+          })
+        }
+      },
+    }
+  }
 
-      if (config.direction === "vert") {
-        y += height;
+  function layoutDirectional(elements: IComponent[], config: IComponentConfig): IReturnComponent {
+    let x = config.x ?? 0
+    let y = config.y ?? 0
+    let minWidth = 0
+    let minHeight = 0
+    const renderElements: ISectorElement[] = []
+    for (let i = 0; i < elements.length; i++) {
+      const element = elements[i]
+
+      let elementX = x
+      let elementY = y
+      if (config.direction === 'vert') {
+        y += element.marginTop ?? 0
+        elementX = x + (element.marginLeft ?? 0)
       } else {
-        x += width;
+        x += element.marginLeft ?? 0
+        elementY = y + (element.marginTop ?? 0)
+      }
+      let width = 0
+      let height = 0
+
+      if ('textBlock' in element) {
+        renderElements.push(renderTextBlock(element.textBlock, x, y, elementX, elementY, element.click))
+        width = element.textBlock.width
+        height = element.textBlock.height
+      } else {
+        const slotComponent = element.slot({x, y})
+        width = slotComponent.width
+        height = slotComponent.height
+      }
+
+      if (config.direction === 'vert') {
+        if (width > minWidth) {
+          minWidth = width
+        }
+        y += height
+      } else {
+        if (height > minHeight) {
+          minHeight = height
+        }
+        x += width
       }
     }
-    servicesManager.sectorManager.attachElements(renderElements);
+    servicesManager.sectorManager.attachElements(renderElements)
+    return {
+      width: Math.max(x - (config.x ?? 0), minWidth),
+      height: Math.max(y - (config.y ?? 0), minHeight),
+    }
   }
 
-  function rows(
-    elements: IComponent[],
-    config: Omit<IComponentConfig, "direction">
-  ) {
-    return layoutDirectional(elements, { ...config, direction: "vert" });
+  function rows(elements: IComponent[], config?: IConfig) {
+    return layoutDirectional(elements, { ...config, direction: 'vert' })
   }
 
-  function columns(
-    elements: IComponent[],
-    config: Omit<IComponentConfig, "direction">
-  ) {
-    return layoutDirectional(elements, { ...config, direction: "horyz" });
+  function columns(elements: IComponent[], config?: IConfig) {
+    return layoutDirectional(elements, { ...config, direction: 'horyz' })
   }
 
   return {
-    rows, columns
-  };
+    rows,
+    columns,
+  }
 }
 
 export type ILayoutDirectionals = ReturnType<typeof createLayoutDirectionals>

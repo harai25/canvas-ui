@@ -1,45 +1,51 @@
-import type { IRowElement } from "~/components/molecules/rows";
+import type { IComponent } from "~/types/component";
 import { initCanvasUI } from "./canvas-ui";
 import "./styles/main.css";
-import type { IColumnElement } from "~/components/molecules/columns";
+import { superGrid } from "./components/super-grid";
 
-const count = 100
+const count = 4000
 // const count = 2000000
 
-let elems: IRowElement[] = [];
+const elems: IComponent[] = [];
 for (let i = 0; i < count / 2; i++) {
   elems.push({
     marginTop: 10,
     marginLeft: 10,
-    background: `rgb(${(i * 20) % 255}, ${(i * 20) % 255}, 255)`,
-    content: `${i * 10 + 21} очеееееень длиннннннныыыыый теееееееееекст`,
-    width: 250,
-    height: 100,
+    textBlock: {
+      background: `rgb(${(i * 20) % 255}, ${(i * 20) % 255}, 255)`,
+      text: `${i * 10 + 21} очеееееень длиннннннныыыыый теееееееееекст`,
+      width: 250,
+      height: 100,
+    },
     click: () => console.log(i),
   });
 }
-let elems2: IRowElement[] = [];
+const elems2: IComponent[] = [];
 for (let i = 0; i < count; i++) {
   elems2.push({
     marginTop: 25,
     marginLeft: 10,
-    background: "yellow",
-    content: `${i}. testestests estest testestset esteststse`,
-    width: 500,
-    height: 50,
+    textBlock: {
+      background: "yellow",
+      text: `${i}. testestests estest testestset esteststse`,
+      width: 500,
+      height: 50 + + Math.random() * 70,
+    },
     click: () => console.log(i),
   });
 }
 
-let elems3: IColumnElement[] = []
+const elems3: IComponent[] = []
 for (let i = 0; i < count; i++) {
   elems3.push({
     marginTop: 25,
     marginLeft: 10,
-    background: "green",
-    content: `${i * 2}. i am in row`,
-    width: 100,
-    height: 200,
+    textBlock: {
+      background: "green",
+      text: `${i * 2}. i am in row`,
+      width: 100 + Math.random() * 100,
+      height: 200,
+    },
     click: () => console.log(i, 'elems3'),
   });
 }
@@ -51,6 +57,8 @@ initCanvasUI(document.getElementById('canvas') as HTMLCanvasElement).render(comp
   componentsManager.molecules.rows(elems2, { x: 500 });
 
   componentsManager.molecules.columns(elems3, { y: -300 })
+
+  superGrid(componentsManager)
 
   componentsManager.molecules.absolute({
     x: 700,

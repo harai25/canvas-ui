@@ -1,5 +1,5 @@
 import { createCanvasManager } from "./canvas";
-import { createComponentsManager, type IComponentesManager } from "./components";
+import { createComponentsManager, type IComponentsManager } from "./components";
 import { createServicesManager } from "./services";
 
 export function initCanvasUI(element: HTMLCanvasElement) {
@@ -8,7 +8,7 @@ export function initCanvasUI(element: HTMLCanvasElement) {
   const componentsManager = createComponentsManager(canvasManager, serviceManager)
 
   return {
-    render: (cb: (componentsManager: IComponentesManager) => void) => {
+    render: (cb: (componentsManager: IComponentsManager) => void) => {
       cb(componentsManager)
       serviceManager.renderManager.render()
       serviceManager.eventsManager.init()

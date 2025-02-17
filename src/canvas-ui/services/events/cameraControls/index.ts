@@ -8,10 +8,17 @@ import { initMobileEvents } from "./mobileEvents";
 
 
 
-export function initCameraControls(canvasManager: ICanvasManager, renderManager: IRenderManager) {
+export function createCameraControlsManager(canvasManager: ICanvasManager, renderManager: IRenderManager) {
   const cameraControl = createCameraControl(canvasManager, renderManager)
   const moveControl = createMoveControl(cameraControl)
   const zoomControl = createZoomControl(cameraControl)
-  initDesktopEvents(canvasManager, moveControl, zoomControl)
-  initMobileEvents(canvasManager, moveControl, zoomControl)
+  return {
+    cameraControl, moveControl, zoomControl,
+    init: () => {
+      initDesktopEvents(canvasManager, moveControl, zoomControl)
+      initMobileEvents(canvasManager, moveControl, zoomControl)
+    }
+  }
 }
+
+export type ICameraControlsManager = ReturnType<typeof createCameraControlsManager>

@@ -1,4 +1,4 @@
-export interface IRenderElement {
+export interface ISectorElement {
   x: number;
   y: number;
   width: number;
@@ -8,13 +8,13 @@ export interface IRenderElement {
 const SECTOR_SIZE = 1000;
 
 export function createSectorsManager() {
-  const sectors: IRenderElement[][][] = [];
+  const sectors: ISectorElement[][][] = [];
 
   function getSector(j: number, i: number) {
     return sectors[i]?.[j];
   }
 
-  function addInSector(j: number, i: number, element: IRenderElement) {
+  function addInSector(j: number, i: number, element: ISectorElement) {
     if (!sectors[i]) {
       sectors[i] = [];
     }
@@ -24,7 +24,7 @@ export function createSectorsManager() {
     sectors[i][j].push(element);
   }
 
-  function attachElement(element: IRenderElement) {
+  function attachElement(element: ISectorElement) {
     const ax = Math.floor(element.x / SECTOR_SIZE);
     const ay = Math.floor(element.y / SECTOR_SIZE);
     const bx = Math.floor((element.x + element.width) / SECTOR_SIZE);
@@ -36,7 +36,7 @@ export function createSectorsManager() {
     }
   }
 
-  function attachElements(objects: IRenderElement[]) {
+  function attachElements(objects: ISectorElement[]) {
     objects.forEach(attachElement)
     // processChunkFor({
     //   end: objects.length,

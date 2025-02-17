@@ -2,7 +2,7 @@ import { type ICanvasManager } from "~/canvas";
 // import { attachEventListener } from "~/services/events/eventsAggregator";
 import type { IAtoms } from "../atoms";
 import type { IServicesManager } from "~/services";
-import type { IRenderElement } from "~/services/sectors";
+import type { ISectorElement } from "~/services/sectors";
 
 interface IRowConfig {
   x?: number;
@@ -26,7 +26,7 @@ export function createRows(canvasManager: ICanvasManager, servicesManager: IServ
     let x = config.x ?? 0;
     let y = config.y ?? 0;
   
-    const renderElements: IRenderElement[] = [];
+    const renderElements: ISectorElement[] = [];
 
     for (let i = 0; i < elements.length; i++) {
       const element = elements[i];
@@ -56,9 +56,11 @@ export function createRows(canvasManager: ICanvasManager, servicesManager: IServ
               fontSize: 24,
             });
           }
-          // if (element.click) {
-          //   attachEventListener({ x, y, width, height, click: element.click });
-          // }
+          if (element.click) {
+            
+            // servicesManager.eventsManager.componentsEvents.addClick()
+            // attachEventListener({ x, y, width, height, click: element.click });
+          }
         },
       });
   

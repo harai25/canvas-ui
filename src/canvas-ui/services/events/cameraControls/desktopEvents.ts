@@ -34,6 +34,7 @@ export function initDesktopEvents(
 
   canvasManager.eventsMethods.addEvent("wheel", (event) => {
     event.preventDefault();
+    moveControl.stopActiveMove()
     const dRatio = event.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP;
     zoomControl.modifyZoom(event.x, event.y, dRatio);
   });

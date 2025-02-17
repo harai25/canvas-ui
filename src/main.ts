@@ -1,6 +1,7 @@
 import type { IRowElement } from "~/components/molecules/rows";
 import { initCanvasUI } from "./canvas-ui";
 import "./styles/main.css";
+import type { IColumnElement } from "~/components/molecules/columns";
 
 const count = 100
 // const count = 2000000
@@ -30,11 +31,26 @@ for (let i = 0; i < count; i++) {
   });
 }
 
+let elems3: IColumnElement[] = []
+for (let i = 0; i < count; i++) {
+  elems3.push({
+    marginTop: 25,
+    marginLeft: 10,
+    background: "green",
+    content: `${i * 2}. i am in row`,
+    width: 100,
+    height: 200,
+    click: () => console.log(i, 'elems3'),
+  });
+}
+
 
 initCanvasUI(document.getElementById('canvas') as HTMLCanvasElement).render(componentsManager => {
   componentsManager.molecules.rows(elems);
 
   componentsManager.molecules.rows(elems2, { x: 500 });
+
+  componentsManager.molecules.columns(elems3, { y: -300 })
 
   componentsManager.molecules.absolute({
     x: 700,

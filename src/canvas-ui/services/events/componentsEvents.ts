@@ -8,7 +8,7 @@ export function createComponentsEvents(
   cameraControlsManager: ICameraControlsManager,
 ) {
 
-  function findInSector(x: number, y: number, sector: ISectorElement[]) {
+  function findInSector(sector: ISectorElement[], x: number, y: number) {
     for (let i = 0; i < sector.length; i++) {
       const el = sector[i];
       if (
@@ -24,13 +24,13 @@ export function createComponentsEvents(
 
   function initClickEvent() {
     canvasManager.eventsMethods.addEvent("click", (e) => {
+      const pointerCoord = cameraControlsManager.cameraControl.getPointerCoord(e.x, e.y)
       const sector = sectorManager.getSector(
-        Math.floor(e.x / sectorManager.SECTOR_SIZE),
-        Math.floor(e.y / sectorManager.SECTOR_SIZE)
+        Math.floor(pointerCoord[0] / sectorManager.SECTOR_SIZE),
+        Math.floor(pointerCoord[1] / sectorManager.SECTOR_SIZE)
       );
       if (sector) {
-        const camera = cameraControlsManager.cameraControl.getCamera()
-        const el = findInSector(camera.moveX + e.x, camera.moveY + e.y, sector);
+        const el = findInSector(sector, pointerCoord[0], pointerCoord[1]);
         if (el) {
           el.events?.click?.()
         }

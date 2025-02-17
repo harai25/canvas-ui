@@ -3,7 +3,8 @@ import type { IAtoms } from "../atoms";
 import type { IServicesManager } from "~/services";
 import type { ISectorElement } from "~/services/sectors";
 import type { IComponentConfig } from "~/types/component";
-export interface IRowElement {
+
+export interface IColumnElement {
   marginLeft?: number;
   marginTop?: number;
   width: number;
@@ -14,21 +15,24 @@ export interface IRowElement {
   click?: () => void;
 }
 
-export function createRows(canvasManager: ICanvasManager, servicesManager: IServicesManager, atoms: IAtoms) {
-
-  return(elements: IRowElement[], config: IComponentConfig = {}) => {
+export function createColumns(
+  canvasManager: ICanvasManager,
+  servicesManager: IServicesManager,
+  atoms: IAtoms
+) {
+  return (elements: IColumnElement[], config: IComponentConfig = {}) => {
     let x = config.x ?? 0;
     let y = config.y ?? 0;
-  
+
     const renderElements: ISectorElement[] = [];
 
     for (let i = 0; i < elements.length; i++) {
       const element = elements[i];
-      y += element.marginTop ?? 0;
+      x += element.marginLeft ?? 0;
       const width = element.width;
       const height = element.height;
-      const currX = x + (element.marginLeft ?? 0)
-      const currY = y;
+      const currX = x;
+      const currY = y + (element.marginTop ?? 0);
       renderElements.push({
         x,
         y,
@@ -38,8 +42,10 @@ export function createRows(canvasManager: ICanvasManager, servicesManager: IServ
           canvasManager.rectangleMethods.drawRectangle({
             x: currX,
             y: currY,
-            width, height, background: element.background ?? "black"
-          })
+            width,
+            height,
+            background: element.background ?? "black",
+          });
           if (element.content) {
             atoms.text({
               content: element.content,
@@ -53,12 +59,12 @@ export function createRows(canvasManager: ICanvasManager, servicesManager: IServ
         },
         events: {
           click: element.click,
-        }
+        },
       });
-  
-      y += height;
+
+      x += width;
     }
-  
-    servicesManager.sectorManager.attachElements(renderElements)
+
+    servicesManager.sectorManager.attachElements(renderElements);
   };
 }

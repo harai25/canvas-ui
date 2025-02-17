@@ -18,7 +18,7 @@ export function initDesktopEvents(
         "mousemove",
         (eventMouseMove) => {
           eventMouseDown.preventDefault();
-          moveControl.scroll(eventMouseMove.x, eventMouseMove.y);
+          moveControl.move(eventMouseMove.x, eventMouseMove.y);
         }
       );
     }, 50);

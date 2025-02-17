@@ -1,18 +1,23 @@
 import type { ICameraControl } from "./cameraControl";
 
 export function createZoomControl(cameraControl: ICameraControl) {
-  let startZoom = 0
+  let startZoomRatio = 0
 
   function zoom(x: number, y: number, zoom: number) {
+    const [pointerX, pointerY] = cameraControl.getPointerCoord(x, y)
+
     const camera = cameraControl.getCamera()
-    const pointerX = (camera.moveX + x) / camera.zoomRatio;
-    const pointerY = (camera.moveY + y) / camera.zoomRatio;
-
+    
     const prevZoomRatio = camera.zoomRatio;
-
     const zoomRatio = Math.max(zoom, 0.4)
-    const moveX = camera.moveX + pointerX * (zoomRatio - prevZoomRatio)
-    const moveY = camera.moveY + pointerY * (zoomRatio - prevZoomRatio)
+
+    const diffMoveX = pointerX * (zoomRatio - prevZoomRatio)
+    const diffMoveY = pointerY * (zoomRatio - prevZoomRatio)
+
+    cameraControl.cameraAdditionalInfo.moveXOnStartMove += diffMoveX
+    cameraControl.cameraAdditionalInfo.moveYOnStartMove += diffMoveY
+    const moveX = camera.moveX + diffMoveX
+    const moveY = camera.moveY + diffMoveY
     cameraControl.setCamera({
       moveX,
       moveY,
@@ -25,11 +30,11 @@ export function createZoomControl(cameraControl: ICameraControl) {
   }
 
   function zoomRelativeStartZoom(x: number, y: number, zoomFactor: number) {
-    zoom(x, y, startZoom * zoomFactor)
+    zoom(x, y, startZoomRatio * zoomFactor)
   }
 
   function initZoom() {
-    startZoom = cameraControl.getCamera().zoomRatio
+    startZoomRatio = cameraControl.getCamera().zoomRatio
   }
 
   return {

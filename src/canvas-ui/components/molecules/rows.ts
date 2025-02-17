@@ -56,12 +56,10 @@ export function createRows(canvasManager: ICanvasManager, servicesManager: IServ
               fontSize: 24,
             });
           }
-          if (element.click) {
-            
-            // servicesManager.eventsManager.componentsEvents.addClick()
-            // attachEventListener({ x, y, width, height, click: element.click });
-          }
         },
+        events: {
+          click: element.click,
+        }
       });
   
       // x+=width

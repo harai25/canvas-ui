@@ -1,9 +1,12 @@
+import type { CustomEvents } from "~/types/events";
+
 export interface ISectorElement {
   x: number;
   y: number;
   width: number;
   height: number;
   render: () => void;
+  events?: CustomEvents,
 }
 const SECTOR_SIZE = 1000;
 

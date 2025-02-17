@@ -24,7 +24,6 @@ export function createComponentsEvents(
 
   function initClickEvent() {
     canvasManager.eventsMethods.addEvent("click", (e) => {
-      console.log(e)
       const sector = sectorManager.getSector(
         Math.floor(e.x / sectorManager.SECTOR_SIZE),
         Math.floor(e.y / sectorManager.SECTOR_SIZE)
@@ -32,8 +31,9 @@ export function createComponentsEvents(
       if (sector) {
         const camera = cameraControlsManager.cameraControl.getCamera()
         const el = findInSector(camera.moveX + e.x, camera.moveY + e.y, sector);
-        console.log(el)
-        // el?.click();
+        if (el) {
+          el.events?.click?.()
+        }
       }
     });
   }

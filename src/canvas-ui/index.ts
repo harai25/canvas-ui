@@ -10,7 +10,7 @@ export function initCanvasUI(element: HTMLCanvasElement) {
   return {
     render: (cb: (componentsManager: IComponentsManager) => void) => {
       cb(componentsManager)
-      serviceManager.renderManager.render()
+      serviceManager.renderManager.firstRender()
       serviceManager.eventsManager.init()
     }
   }

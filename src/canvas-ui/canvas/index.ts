@@ -2,6 +2,7 @@ import { createRectangleMethods } from "./rectangle";
 import { createTextMethods } from "./text";
 import { createRenderMethods } from "./render";
 import { createEventsMethods } from "./events";
+// import { createImageDataMethods } from "./offscreen";
 
 export function createCanvasManager(canvas: HTMLCanvasElement) {
   if (!canvas) {
@@ -19,17 +20,17 @@ export function createCanvasManager(canvas: HTMLCanvasElement) {
   setCanvasSize();
   ctx.textBaseline = "top";
 
+  const getCanvasSize = () => ({
+    width: canvas.width,
+    height: canvas.height
+  })
+
   return {
     rectangleMethods: createRectangleMethods(ctx),
     textMethods: createTextMethods(ctx),
     renderMethods: createRenderMethods(ctx),
     eventsMethods: createEventsMethods(ctx),
-    getCanvasSize: () => {
-      return {
-        width: canvas.width,
-        height: canvas.height
-      }
-    }
+    getCanvasSize,
   };
 }
 

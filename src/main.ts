@@ -1,7 +1,8 @@
 import type { IComponent } from "~/types/component";
 import { initCanvasUI } from "./canvas-ui";
 import "./styles/main.css";
-import { superGrid } from "./components/super-grid";
+import { superGrid } from "./components/superGrid";
+import { fetchTodos } from "./components/fetchTodos";
 
 const count = 4000
 // const count = 2000000
@@ -59,6 +60,8 @@ initCanvasUI(document.getElementById('canvas') as HTMLCanvasElement).render(comp
   componentsManager.molecules.columns(elems3, { y: -300 })
 
   superGrid(componentsManager)
+
+  fetchTodos(componentsManager)
 
   componentsManager.molecules.absolute({
     x: 700,

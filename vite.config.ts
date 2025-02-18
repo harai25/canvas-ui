@@ -3,7 +3,7 @@ import { defineConfig } from 'vite'
 import Terminal from 'vite-plugin-terminal'
 
 export default defineConfig({
-  base: 'canvas-ui',
+  base: '/canvas-ui/',
   plugins: [
     Terminal()
   ],

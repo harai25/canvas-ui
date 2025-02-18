@@ -2,7 +2,7 @@ import type { IComponentsManager } from "~/components";
 import type { IComponent } from "~/types/component";
 
 const GRID_DISTANCE = 50
-const X = 2000
+const X = 1600
 
 
 export function superGrid(componentsManager: IComponentsManager) {
